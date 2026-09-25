@@ -1,0 +1,17 @@
+# Build and intermediate directories
+bin/
+obj/
+temp/
+
+# Compiled binaries and object files
+*.o
+*.obj
+*.exe
+
+# VS Code / IDE configs (optional)
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
