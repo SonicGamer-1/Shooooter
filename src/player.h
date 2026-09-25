@@ -10,7 +10,7 @@ public:
     Player(float x = 0.0f, float y = 0.0f, float size = PLAYER_DEFAULT_SIZE, float speed = PLAYER_DEFAULT_SPEED, SDL_Texture *tex = nullptr);
 
     void handleInput(const Uint8 *keystate);
-    void update(float deltaTime, int screenWidth, int screenHeight);
+    void update(float deltaTime);
     void render(SDL_Renderer *renderer) const;
 
     // Getters

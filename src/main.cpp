@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
         // Input and physics
         const Uint8 *keystate = SDL_GetKeyboardState(nullptr);
         player.handleInput(keystate);
-        player.update(deltaTime, SCREEN_WIDTH, SCREEN_HEIGHT);
+        player.update(deltaTime);
 
         float playerCenterX = player.getX() + player.getSize() / 2.0f;
         float playerCenterY = player.getY() + player.getSize() / 2.0f;

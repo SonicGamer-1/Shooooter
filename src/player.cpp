@@ -24,7 +24,7 @@ void Player::handleInput(const Uint8 *keystate)
     }
 }
 
-void Player::update(float deltaTime, int screenWidth, int screenHeight)
+void Player::update(float deltaTime)
 {
     vx += ax * speed * deltaTime;
     vy += ay * speed * deltaTime;
