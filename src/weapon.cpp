@@ -1,9 +1,7 @@
 #include "weapon.h"
+#include "consts.h"
 #include <cmath>
 #include <algorithm>
-
-constexpr float PI = 3.14159265358979323846f;
-constexpr float RAD_TO_DEG = 180.0f / PI;
 
 Weapon::Weapon(
     const std::string &name,
@@ -155,7 +153,7 @@ void Weapon::spawnBullet(float startX, float startY, float dX, float dY)
     b.vy = dY * bulletSpeed;
     b.distanceTraveled = 0.0f;
     b.maxRange = range;
-    b.size = 4.0f;
+    b.size = BULLET_DEFAULT_SIZE;
     b.active = true;
 
     bullets.push_back(b);
@@ -266,12 +264,12 @@ void Weapon::renderBullets(SDL_Renderer *renderer) const
             static_cast<int>(b.size)
         };
 
-        // Inner glowing bullet (bright golden yellow)
-        SDL_SetRenderDrawColor(renderer, 255, 230, 80, 255);
+        // Inner glowing bullet
+        SDL_SetRenderDrawColor(renderer, BULLET_COLOR_R, BULLET_COLOR_G, BULLET_COLOR_B, BULLET_COLOR_A);
         SDL_RenderFillRect(renderer, &bulletRect);
 
         // Core highlight
-        SDL_SetRenderDrawColor(renderer, 255, 255, 200, 255);
+        SDL_SetRenderDrawColor(renderer, BULLET_CORE_COLOR_R, BULLET_CORE_COLOR_G, BULLET_CORE_COLOR_B, BULLET_CORE_COLOR_A);
         SDL_RenderDrawPoint(renderer, static_cast<int>(b.x), static_cast<int>(b.y));
     }
 }

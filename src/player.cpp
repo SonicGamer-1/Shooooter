@@ -29,8 +29,8 @@ void Player::update(float deltaTime, int screenWidth, int screenHeight)
     vx += ax * speed * deltaTime;
     vy += ay * speed * deltaTime;
 
-    vx *= std::exp(-0.9f * deltaTime);
-    vy *= std::exp(-0.9f * deltaTime);
+    vx *= std::exp(-PLAYER_FRICTION * deltaTime);
+    vy *= std::exp(-PLAYER_FRICTION * deltaTime);
 
     x += vx * deltaTime;
     y += vy * deltaTime;

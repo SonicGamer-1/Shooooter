@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <string>
+#include "consts.h"
 
 // Structure representing an active projectile/bullet fired from a weapon
 struct Bullet
@@ -23,14 +24,14 @@ class Weapon
 {
 public:
     Weapon(
-        const std::string &name = "Basic Weapon",
-        float reloadSpeed = 1.5f,     // Time in seconds to reload
-        float range = 600.0f,          // Maximum travel distance of bullets (pixels)
-        float bulletSpeed = 800.0f,    // Bullet travel speed (pixels/sec)
-        int magSize = 12,              // Magazine capacity
-        float fireRate = 0.2f,         // Cooldown between shots (seconds)
-        float width = 36.0f,           // Weapon sprite display width
-        float height = 12.0f,          // Weapon sprite display height
+        const std::string &name = WEAPON_DEFAULT_NAME,
+        float reloadSpeed = WEAPON_DEFAULT_RELOAD_SPEED,
+        float range = WEAPON_DEFAULT_RANGE,
+        float bulletSpeed = WEAPON_DEFAULT_BULLET_SPEED,
+        int magSize = WEAPON_DEFAULT_MAG_SIZE,
+        float fireRate = WEAPON_DEFAULT_FIRE_RATE,
+        float width = WEAPON_SPRITE_WIDTH,
+        float height = WEAPON_SPRITE_HEIGHT,
         SDL_Texture *texture = nullptr // Weapon sprite texture
     );
 

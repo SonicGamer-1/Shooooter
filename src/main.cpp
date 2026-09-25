@@ -33,12 +33,7 @@ SDL_Texture *CreateCircleTexture(SDL_Renderer *renderer, int radius)
 {
     int diameter = radius * 2;
 
-    SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(
-        0,
-        diameter,
-        diameter,
-        32,
-        SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, diameter, diameter, 32, SDL_PIXELFORMAT_RGBA32);
 
     if (!surface)
         return nullptr;
@@ -103,8 +98,8 @@ void SpawnSparks(std::vector<Particle> &particles, float x, float y, float dirX,
 // Draw a futuristic aim crosshair at mouse coordinates
 void RenderCrosshair(SDL_Renderer *renderer, int x, int y, float kickback)
 {
-    int gap = static_cast<int>(5 + kickback * 4.0f);
-    int length = 8;
+    int gap = static_cast<int>(CROSSHAIR_BASE_GAP + kickback * 4.0f);
+    int length = CROSSHAIR_TICK_LENGTH;
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 200);
 
@@ -121,11 +116,11 @@ void RenderCrosshair(SDL_Renderer *renderer, int x, int y, float kickback)
 // Render Ammo & Reload HUD
 void RenderHUD(SDL_Renderer *renderer, const Weapon &weapon)
 {
-    int startX = 25;
-    int startY = SCREEN_HEIGHT - 35;
-    int pipWidth = 6;
-    int pipHeight = 16;
-    int pipGap = 4;
+    int startX = HUD_START_X;
+    int startY = SCREEN_HEIGHT - HUD_START_Y_OFFSET;
+    int pipWidth = HUD_PIP_WIDTH;
+    int pipHeight = HUD_PIP_HEIGHT;
+    int pipGap = HUD_PIP_GAP;
 
     // Draw ammo magazine pips
     for (int i = 0; i < weapon.getMagSize(); ++i)
@@ -138,7 +133,7 @@ void RenderHUD(SDL_Renderer *renderer, const Weapon &weapon)
 
         if (i < weapon.getCurrentAmmo())
         {
-            SDL_SetRenderDrawColor(renderer, 0, 220, 255, 230); // Available ammo
+            SDL_SetRenderDrawColor(renderer, HUD_AMMO_COLOR_R, HUD_AMMO_COLOR_G, HUD_AMMO_COLOR_B, HUD_AMMO_COLOR_A);
             SDL_RenderFillRect(renderer, &pipRect);
         }
         else
@@ -161,7 +156,7 @@ void RenderHUD(SDL_Renderer *renderer, const Weapon &weapon)
 
         int fillW = static_cast<int>(barW * weapon.getReloadProgress());
         SDL_Rect fillBar = {startX, barY, fillW, barH};
-        SDL_SetRenderDrawColor(renderer, 255, 180, 40, 255);
+        SDL_SetRenderDrawColor(renderer, HUD_RELOAD_BAR_COLOR_R, HUD_RELOAD_BAR_COLOR_G, HUD_RELOAD_BAR_COLOR_B, HUD_RELOAD_BAR_COLOR_A);
         SDL_RenderFillRect(renderer, &fillBar);
     }
 }
@@ -228,12 +223,12 @@ int main(int argc, char *argv[])
         playerSpeed,
         playerTex);
 
-    Weapon weapon("Pistol", 1.2f, 600.0f, 850.0f, 12, 0.16f);
+    Weapon weapon;
     weapon.createDefaultTexture(renderer);
 
     // Visual effect states
     std::vector<Particle> particles;
-    MuzzleFlash muzzleFlash = {0.0f, 0.0f, 0.0f, 0.06f, 14.0f};
+    MuzzleFlash muzzleFlash = {0.0f, 0.0f, 0.0f, MUZZLE_FLASH_DURATION, MUZZLE_FLASH_SIZE};
     float screenShake = 0.0f;
     float crosshairKickback = 0.0f;
 
@@ -306,17 +301,17 @@ int main(int argc, char *argv[])
             if (weapon.shoot())
             {
                 // Visual & physical juice on shoot
-                screenShake = 3.5f;
+                screenShake = SCREEN_SHAKE_INTENSITY;
                 crosshairKickback = 1.0f;
 
-                float rad = weapon.getAngle() * (3.14159265f / 180.0f);
+                float rad = weapon.getAngle() * (PI / 180.0f);
                 float dirX = std::cos(rad);
                 float dirY = std::sin(rad);
 
                 float playerCenterX = player.getX() + player.getSize() / 2.0f;
                 float playerCenterY = player.getY() + player.getSize() / 2.0f;
-                float muzzleX = playerCenterX + dirX * 36.0f;
-                float muzzleY = playerCenterY + dirY * 36.0f;
+                float muzzleX = playerCenterX + dirX * WEAPON_SPRITE_WIDTH;
+                float muzzleY = playerCenterY + dirY * WEAPON_SPRITE_WIDTH;
 
                 // Trigger muzzle flash
                 muzzleFlash.x = muzzleX;
@@ -324,7 +319,7 @@ int main(int argc, char *argv[])
                 muzzleFlash.timer = muzzleFlash.duration;
 
                 // Spawn muzzle sparks
-                SpawnSparks(particles, muzzleX, muzzleY, dirX, dirY, 5, 255, 210, 80);
+                SpawnSparks(particles, muzzleX, muzzleY, dirX, dirY, MUZZLE_SPARKS_COUNT, 255, 210, 80);
             }
         }
 
@@ -340,7 +335,7 @@ int main(int argc, char *argv[])
         // Spawn movement dust particles behind player
         static float dustTimer = 0.0f;
         dustTimer += deltaTime;
-        if (dustTimer >= 0.04f)
+        if (dustTimer >= DUST_SPAWN_INTERVAL)
         {
             dustTimer = 0.0f;
             if (keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_A] ||
@@ -382,11 +377,11 @@ int main(int argc, char *argv[])
         // Update effect timers
         if (screenShake > 0.0f)
         {
-            screenShake = std::max(0.0f, screenShake - 18.0f * deltaTime);
+            screenShake = std::max(0.0f, screenShake - SCREEN_SHAKE_DECAY * deltaTime);
         }
         if (crosshairKickback > 0.0f)
         {
-            crosshairKickback = std::max(0.0f, crosshairKickback - 6.0f * deltaTime);
+            crosshairKickback = std::max(0.0f, crosshairKickback - CROSSHAIR_KICKBACK_DECAY * deltaTime);
         }
         if (muzzleFlash.timer > 0.0f)
         {
@@ -410,12 +405,12 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
 
         // Subtle background grid for motion depth
-        SDL_SetRenderDrawColor(renderer, 32, 34, 44, 120);
-        for (int gx = 0; gx < SCREEN_WIDTH; gx += 40)
+        SDL_SetRenderDrawColor(renderer, GRID_COLOR_R, GRID_COLOR_G, GRID_COLOR_B, GRID_COLOR_A);
+        for (int gx = 0; gx < SCREEN_WIDTH; gx += GRID_CELL_SIZE)
         {
             SDL_RenderDrawLine(renderer, gx, 0, gx, SCREEN_HEIGHT);
         }
-        for (int gy = 0; gy < SCREEN_HEIGHT; gy += 40)
+        for (int gy = 0; gy < SCREEN_HEIGHT; gy += GRID_CELL_SIZE)
         {
             SDL_RenderDrawLine(renderer, 0, gy, SCREEN_WIDTH, gy);
         }
